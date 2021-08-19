@@ -10,16 +10,18 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:3.1 AS build
 WORKDIR /src
-COPY ["Week8Task/", "Week8Task/"]
-RUN dotnet restore 
+COPY Week8Task/*.csproj  Week8Task/
+RUN dotnet restore Week8Task/*.csproj
 COPY . .
 WORKDIR "/src/Week8Task"
-RUN dotnet build  -c Release -o /app/build
+#RUN dotnet build  -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish  -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Week8Task.dll"]
+
+#ENTRYPOINT ["dotnet", "Week8Task.dll"]
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet Week8Task.dll
